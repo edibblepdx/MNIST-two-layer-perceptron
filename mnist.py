@@ -19,9 +19,15 @@ class Perceptron:
         self.hidden_weights = WEIGHT_SCALE * np.random.randn(hidden_units, input_size + 1)
         self.output_weights = WEIGHT_SCALE * np.random.randn(output_units, hidden_units + 1)
 
-    def activation(self, h):
+    def activation(self, a):
         # sigmoid function
-        return 1 / (1 + math.exp(-h))
+        return 1 / (1 + math.exp(-a))
+
+    def output_error(self):
+        a = 1
+
+    def hidden_error(self):
+        a = 1
 
     def fix_weights(self):
         a = 1
@@ -42,10 +48,17 @@ class Perceptron:
         """
         train_accuracies = []
         test_accuracies = []
-        hidden_activations = np.zeros(self.hidden_units + 1)    # hidden activations +1 for bias
         output_activations = np.zeros(self.output_units)        # output activations
+        hidden_activations = np.zeros(self.hidden_units + 1)    # hidden activations +1 for bias
+        output_errors = np.zeros(self.output_units)
+        hidden_errors = np.zeros(self.hidden_units)
+        output_deltas = np.zeros(np.shape(self.output_weights))
+        hidden_deltas = np.zeros(np.shape(self.hidden_weights))
 
         for epoch in range(epochs):
+            # i-th input
+            # j-th hidden unit
+            # k-th output unit
             num_correct = 0.0
 
             # inner loop will run 60,000 times
@@ -54,16 +67,21 @@ class Perceptron:
                 x = np.insert(x, 0, 1.0)        # bias
 
                 # forward phase
-                for i in range(self.hidden_units):
-                    h = np.dot(x, self.hidden_weights[i])
-                    hidden_activations[i + 1] = self.activation(h)   # activation of hidden layer neurons
+                # hidden activations
+                for j in range(self.hidden_units):
+                    # j-th hidden unit
+                    a = np.dot(x, self.hidden_weights[j])
+                    hidden_activations[j + 1] = self.activation(a)   # activation of hidden layer neurons
 
                 hidden_activations[0] = 1.0     # bias 
 
-                for j in range(self.output_units):
-                    h = np.dot(hidden_activations, self.output_weights[j])
-                    output_activations[j] = self.activation(h)       # activation of output layer neurons
+                # output activations
+                for k in range(self.output_units):
+                    # k-th output unit
+                    a = np.dot(hidden_activations, self.output_weights[k])
+                    output_activations[k] = self.activation(a)       # activation of output layer neurons
 
+                # predict
                 prediction = np.argmax(output_activations)
 
                 # backward phase
@@ -72,7 +90,51 @@ class Perceptron:
                     num_correct += 1
                 else:
                     # not all fine and dandy
-                    self.fix_weights()
+                    # output errors
+                    for k in range(self.output_units):
+                        t = 0.9 if k == target else 0.1
+                        y = output_activations[k]
+                        # be careful of sign
+                        output_errors[k] = y * (1 - y) * (t - y)
+
+                    # hidden errors
+                    for j in range(self.hidden_units):
+                        h = hidden_activations[j + 1]   # bias is index 0
+                        # be careful of sign
+                        sum = 0.0
+                        for k in range(self.output_units):
+                            sum += self.output_weights[k][j] * output_errors[k]
+                        hidden_errors[j] = h * (1 - h) * sum
+
+                    # output deltas
+                    for k in range(self.output_units):
+                        # k-th output unit
+                        for j in range(self.hidden_units + 1):
+                            # j-th hidden unit
+                            output_deltas[k][j] = (
+                                (self.learning_rate 
+                                * output_errors[k] 
+                                * hidden_activations[j]) 
+                                + (self.momentum 
+                                * output_deltas[k][j])
+                            )
+
+                    # hidden deltas
+                    for j in range(self.hidden_units):
+                        # j-th hidden unit
+                        for i in range(self.input_size + 1):
+                            # i-th input
+                            hidden_deltas[j][i] = (
+                                (self.learning_rate 
+                                * hidden_errors[j]
+                                * x[i])
+                                + (self.momentum
+                                * hidden_deltas[j][i])
+                            )
+
+                    # fix weights
+                    self.output_weights = np.add(self.output_weights, output_deltas)
+                    self.hidden_weights = np.add(self.hidden_weights, hidden_deltas)
 
             train_accuracy = num_correct / len(x_train)
             train_accuracies.append(train_accuracy)
@@ -133,6 +195,6 @@ if __name__ == '__main__':
     learning_rate = 0.1
     momentum = 0.9
     hidden_units = 20
-    epochs = 50
+    epochs = 5
 
     sys.exit(main(learning_rate, momentum, hidden_units, epochs))
