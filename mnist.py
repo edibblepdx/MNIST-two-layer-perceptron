@@ -310,7 +310,7 @@ if __name__ == '__main__':
     learning_rate = 0.1
     momentum = 0.9
     hidden_units = 20
-    epochs = 1
+    epochs = 50
     fraction = 1            # what % of the test set to use
 
     sys.exit(main(learning_rate, momentum, hidden_units, epochs, fraction))
