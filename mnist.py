@@ -131,7 +131,7 @@ class Perceptron:
             # i-th input
             # j-th hidden unit
             # k-th output unit
-            num_correct = 0.0
+            num_correct = 0.0       # counter for accuracy on the train set
 
             # permute x_train and y_train
             x_train, y_train = self.permute(x_train, y_train)
@@ -195,7 +195,7 @@ class Perceptron:
         """
         output_activations = np.zeros(self.output_units)        # output activations
         hidden_activations = np.zeros(self.hidden_units + 1)    # hidden activations +1 for bias
-        num_correct = 0.0
+        num_correct = 0.0                                       # counter for accuracy on the test set
 
         for (x, target) in zip(x_test, y_test):
             x = x.flatten()
@@ -216,8 +216,8 @@ class Perceptron:
         """
         output_activations = np.zeros(self.output_units)        # output activations
         hidden_activations = np.zeros(self.hidden_units + 1)    # hidden activations +1 for bias
-        y_true = []
-        y_pred = []
+        y_true = []     # true value
+        y_pred = []     # prediction
 
         for (x, target) in zip(x_test, y_test):
             x = x.flatten()
@@ -236,10 +236,11 @@ def train_subset(x_train, y_train, fraction, num_classes=10):
     """
     take only a balanced subset of the training set
     """
-    samples_per_class = int((len(x_train) * fraction) / num_classes)
+    # ensure a balanced training set
+    samples_per_class = int((len(x_train) * fraction) / num_classes)   
 
-    x_subset = []
-    y_subset = []
+    x_subset = []   # subset of inputs
+    y_subset = []   # subset of labels
 
     for c in range(num_classes):
         # get the indexes
