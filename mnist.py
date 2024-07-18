@@ -171,6 +171,7 @@ class Perceptron:
             test_accuracy = self.evaluate(x_test, y_test)
             test_accuracies.append(test_accuracy)
 
+            # print a message at the end of the current epoch
             print(f'Epoch {epoch} : Correct Train {num_correct:.0f} : Accuracy Train {train_accuracy:.4f} : Accuracy Test {test_accuracy:.4f}')
 
         return train_accuracies, test_accuracies
