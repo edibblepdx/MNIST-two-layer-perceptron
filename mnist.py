@@ -290,27 +290,25 @@ def main(learning_rate, momentum, hidden_units, epochs, fraction):
 
 if __name__ == '__main__':
     """
-    weights = (-.05 < w < .05)
+    learning_rate = 0.1
+    initial weights = (-.05 < w < .05)
     batch size = 1
     epochs = 50
 
     Experiment 1:
-        learning_rate = 0.1
         momentum = 0.9
         hidden_units = {20, 50, 100}
+        fraction = 1
 
     Experiment 2:
-        learning_rate = 0.1
         momentum = {0, 0.25, 0.50}
         hidden_units = 100
+        fraction = 1
     
     Experiment 3: 
-        Train two networks, using respectively one quarter and one half of the training
-        examples for training. Make sure that in each case your training data is approximately
-        balanced among the 10 different classes.
-
-        hidden_units = 100
         momentum = 0.9
+        hidden_units = 100
+        fraction = {0.25, 0.5}
     """
 
     learning_rate = 0.1
