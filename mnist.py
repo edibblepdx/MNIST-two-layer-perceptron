@@ -108,18 +108,6 @@ class Perceptron:
     def train(self, x_train, y_train, x_test, y_test, epochs):
         """
         Train the model
-
-        for each input vector:
-            forwards phase:
-                - compute the activation of each neuron j in the hidden layer(s)
-                - work through the network until you get to the output layer neurons,
-                  which have activations
-            backwards phase:
-                - compute the error at the output
-                - compute the error in the hidden layer(s)
-                - update the output layer weights
-                - update the hidden layer weights
-            recall
         """
         train_accuracies = []
         test_accuracies = []
@@ -166,57 +154,25 @@ class Perceptron:
                 if prediction == target:
                     # all fine and dandy
                     num_correct += 1
+
                 elif epoch != 0:
                     # not all fine and dandy
-                    # output errors
-                    for k in range(self.output_units):
-                        t = 0.9 if k == target else 0.1
-                        y = output_activations[k]
-                        # be careful of sign
-                        output_errors[k] = y * (1 - y) * (t - y)
 
-                    # hidden errors
-                    for j in range(self.hidden_units):
-                        h = hidden_activations[j + 1]   # bias is index 0
-                        # be careful of sign
-                        sum = 0.0
-                        for k in range(self.output_units):
-                            sum += self.output_weights[k][j] * output_errors[k]
-                        hidden_errors[j] = h * (1 - h) * sum
+                    # errors
+                    self.errors(output_activations, output_errors, hidden_activations, hidden_errors, target)
 
-                    # output weight updates
-                    for k in range(self.output_units):
-                        # k-th output unit
-                        for j in range(self.hidden_units + 1):
-                            # j-th hidden unit
-                            output_weight_updates[k][j] = (
-                                (self.learning_rate 
-                                * output_errors[k] 
-                                * hidden_activations[j]) 
-                                + (self.momentum 
-                                * output_weight_updates[k][j])
-                            )
-
-                    # hidden weight updates
-                    for j in range(self.hidden_units):
-                        # j-th hidden unit
-                        for i in range(self.input_size + 1):
-                            # i-th input
-                            hidden_weight_updates[j][i] = (
-                                (self.learning_rate 
-                                * hidden_errors[j]
-                                * x[i])
-                                + (self.momentum
-                                * hidden_weight_updates[j][i])
-                            )
+                    # weight updates
+                    self.weight_updates(output_errors, output_weight_updates, hidden_activations, hidden_errors, hidden_weight_updates, x)
 
                     # fix weights
                     self.output_weights = np.add(self.output_weights, output_weight_updates)
                     self.hidden_weights = np.add(self.hidden_weights, hidden_weight_updates)
 
+            # train accuracy
             train_accuracy = num_correct / len(x_train)
             train_accuracies.append(train_accuracy)
 
+            # test accuracy
             test_accuracy = self.evaluate(x_test, y_test)
             test_accuracies.append(test_accuracy)
 
@@ -292,7 +248,7 @@ def main(learning_rate, momentum, hidden_units, epochs):
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.title(f'Perceptron Learning Accuracy (η={learning_rate})')
-    plt.legend(loc='upper left')
+    plt.legend(loc='lower right')
     plt.show()
 
     # Confusion matrices for the perceptron on the test set
@@ -307,12 +263,13 @@ def main(learning_rate, momentum, hidden_units, epochs):
 if __name__ == '__main__':
     """
     weights = (-.05 < w < .05)
+    batch size = 1
+    epochs = 50
 
     Experiment 1:
         learning_rate = 0.1
         momentum = 0.9
         hidden_units = {20, 50, 100}
-        epochs = 50
 
     Experiment 2:
         learning_rate = 0.1
@@ -326,18 +283,11 @@ if __name__ == '__main__':
 
         hidden_units = 100
         momentum = 0.9
-
-    Change weights after each training example and return:
-        plot of both training and test accuracy as a function of epoch number 
-        confusion matrix for each of your trained networks
-
-        Each output unit corresponds to one of the 10 classes (0 to 9). Set the target
-        value tk for output unit k to 0.9 if the input class is the kth class, 0.1 otherwise.
     """
 
     learning_rate = 0.1
     momentum = 0.9
     hidden_units = 20
-    epochs = 5
+    epochs = 1
 
     sys.exit(main(learning_rate, momentum, hidden_units, epochs))
