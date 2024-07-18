@@ -65,35 +65,45 @@ class Perceptron:
                 sum += self.output_weights[k][j] * output_errors[k]
             hidden_errors[j] = h * (1 - h) * sum
 
-    def deltas(self, output_errors, output_deltas, hidden_activations, hidden_errors, hidden_deltas, x):
+    def weight_updates(self, output_errors, output_weight_updates, hidden_activations, hidden_errors, hidden_weight_updates, x):
         """
-        Get weight deltas
+        Get weight weight updates
         """
-        # output deltas
+        # output weight updates
         for k in range(self.output_units):
             # k-th output unit
             for j in range(self.hidden_units + 1):
                 # j-th hidden unit
-                output_deltas[k][j] = (
+                output_weight_updates[k][j] = (
                     (self.learning_rate 
                     * output_errors[k] 
                     * hidden_activations[j]) 
                     + (self.momentum 
-                    * output_deltas[k][j])
+                    * output_weight_updates[k][j])
                 )
 
-        # hidden deltas
+        # hidden weight updates
         for j in range(self.hidden_units):
             # j-th hidden unit
             for i in range(self.input_size + 1):
                 # i-th input
-                hidden_deltas[j][i] = (
+                hidden_weight_updates[j][i] = (
                     (self.learning_rate 
                     * hidden_errors[j]
                     * x[i])
                     + (self.momentum
-                    * hidden_deltas[j][i])
+                    * hidden_weight_updates[j][i])
                 )
+    
+    def permute(self, x_train, y_train):
+        """
+        Create copies of x_train and y_train with unified permutations
+        """
+        assert len(x_train) == len(y_train)
+        rng = np.random.default_rng()
+        p = rng.permutation(len(x_train))
+        return x_train[p], y_train[p]
+
 
     def train(self, x_train, y_train, x_test, y_test, epochs):
         """
@@ -117,14 +127,17 @@ class Perceptron:
         hidden_activations = np.zeros(self.hidden_units + 1)    # hidden activations +1 for bias
         output_errors = np.zeros(self.output_units)
         hidden_errors = np.zeros(self.hidden_units)
-        output_deltas = np.zeros(np.shape(self.output_weights))
-        hidden_deltas = np.zeros(np.shape(self.hidden_weights))
+        output_weight_updates = np.zeros(np.shape(self.output_weights))
+        hidden_weight_updates = np.zeros(np.shape(self.hidden_weights))
 
-        for epoch in range(epochs):
+        for epoch in range(epochs + 1):
             # i-th input
             # j-th hidden unit
             # k-th output unit
             num_correct = 0.0
+
+            # permute x_train and y_train
+            x_train, y_train = self.permute(x_train, y_train)
 
             # inner loop will run 60,000 times
             for (x, target) in zip(x_train, y_train):
@@ -153,7 +166,7 @@ class Perceptron:
                 if prediction == target:
                     # all fine and dandy
                     num_correct += 1
-                else:
+                elif epoch != 0:
                     # not all fine and dandy
                     # output errors
                     for k in range(self.output_units):
@@ -171,35 +184,35 @@ class Perceptron:
                             sum += self.output_weights[k][j] * output_errors[k]
                         hidden_errors[j] = h * (1 - h) * sum
 
-                    # output deltas
+                    # output weight updates
                     for k in range(self.output_units):
                         # k-th output unit
                         for j in range(self.hidden_units + 1):
                             # j-th hidden unit
-                            output_deltas[k][j] = (
+                            output_weight_updates[k][j] = (
                                 (self.learning_rate 
                                 * output_errors[k] 
                                 * hidden_activations[j]) 
                                 + (self.momentum 
-                                * output_deltas[k][j])
+                                * output_weight_updates[k][j])
                             )
 
-                    # hidden deltas
+                    # hidden weight updates
                     for j in range(self.hidden_units):
                         # j-th hidden unit
                         for i in range(self.input_size + 1):
                             # i-th input
-                            hidden_deltas[j][i] = (
+                            hidden_weight_updates[j][i] = (
                                 (self.learning_rate 
                                 * hidden_errors[j]
                                 * x[i])
                                 + (self.momentum
-                                * hidden_deltas[j][i])
+                                * hidden_weight_updates[j][i])
                             )
 
                     # fix weights
-                    self.output_weights = np.add(self.output_weights, output_deltas)
-                    self.hidden_weights = np.add(self.hidden_weights, hidden_deltas)
+                    self.output_weights = np.add(self.output_weights, output_weight_updates)
+                    self.hidden_weights = np.add(self.hidden_weights, hidden_weight_updates)
 
             train_accuracy = num_correct / len(x_train)
             train_accuracies.append(train_accuracy)
