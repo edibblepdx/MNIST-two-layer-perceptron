@@ -223,11 +223,34 @@ class Perceptron:
 
         return confusion_matrix(y_true, y_pred)
 
+def train_subset(x_train, y_train, fraction, num_classes=10):
+    """
+    take only a balanced subset of the training set
+    """
+    samples_per_class = int((len(x_train) * fraction) / num_classes)
+
+    x_subset = []
+    y_subset = []
+
+    for c in range(num_classes):
+        # get the indexes
+        i = np.where(y_train == c)[0]   # np.where returns a tuple
+        i = np.random.choice(i, size=samples_per_class, replace=False)
+
+        # append those elements to the subsets
+        x_subset.append(x_train[i])
+        y_subset.append(y_train[i])
+
+    # have to use np.concatenate instead of np.array
+    return np.concatenate(x_subset), np.concatenate(y_subset)
 
 def main(learning_rate, momentum, hidden_units, epochs):
     # load the MNIST dataset
     mnist = tf.keras.datasets.mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+    # take a subset of the data
+    # x_train, y_train = train_subset(x_train, y_train, 0.25)
 
     # Scale data to be between 0 and 1
     x_train, x_test = x_train / 255.0, x_test / 255.0
