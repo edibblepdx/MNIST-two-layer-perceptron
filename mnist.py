@@ -140,19 +140,7 @@ class Perceptron:
                 x = np.insert(x, 0, 1.0)        # bias
 
                 # forward phase
-                # hidden activations
-                for j in range(self.hidden_units):
-                    # j-th hidden unit
-                    a = np.dot(x, self.hidden_weights[j])
-                    hidden_activations[j + 1] = self.activation(a)   # activation of hidden layer neurons
-
-                hidden_activations[0] = 1.0     # bias 
-
-                # output activations
-                for k in range(self.output_units):
-                    # k-th output unit
-                    a = np.dot(hidden_activations, self.output_weights[k])
-                    output_activations[k] = self.activation(a)       # activation of output layer neurons
+                self.forward(output_activations, hidden_activations, x)
 
                 # predict
                 prediction = np.argmax(output_activations)
@@ -164,7 +152,7 @@ class Perceptron:
 
                 elif epoch != 0:
                     # not all fine and dandy
-                    
+
                     # errors
                     self.errors(output_activations, output_errors, hidden_activations, hidden_errors, target)
 
