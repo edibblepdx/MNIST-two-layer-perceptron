@@ -244,13 +244,18 @@ def train_subset(x_train, y_train, fraction, num_classes=10):
     # have to use np.concatenate instead of np.array
     return np.concatenate(x_subset, axis=0), np.concatenate(y_subset, axis=0)
 
-def main(learning_rate, momentum, hidden_units, epochs):
+def main(learning_rate, momentum, hidden_units, epochs, fraction):
     # load the MNIST dataset
     mnist = tf.keras.datasets.mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
     # take a subset of the data
-    # x_train, y_train = train_subset(x_train, y_train, 0.25)
+    if fraction != 1:
+        x_train, y_train = train_subset(x_train, y_train, fraction)
+
+    # training shapes
+    print("x_train: ", np.shape(x_train))
+    print("y_train: ", np.shape(y_train))
 
     # Scale data to be between 0 and 1
     x_train, x_test = x_train / 255.0, x_test / 255.0
@@ -312,5 +317,6 @@ if __name__ == '__main__':
     momentum = 0.9
     hidden_units = 20
     epochs = 1
+    fraction = 1
 
-    sys.exit(main(learning_rate, momentum, hidden_units, epochs))
+    sys.exit(main(learning_rate, momentum, hidden_units, epochs, fraction))
