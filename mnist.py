@@ -242,7 +242,7 @@ def train_subset(x_train, y_train, fraction, num_classes=10):
         y_subset.append(y_train[i])
 
     # have to use np.concatenate instead of np.array
-    return np.concatenate(x_subset), np.concatenate(y_subset)
+    return np.concatenate(x_subset, axis=0), np.concatenate(y_subset, axis=0)
 
 def main(learning_rate, momentum, hidden_units, epochs):
     # load the MNIST dataset
