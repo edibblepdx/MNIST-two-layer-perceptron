@@ -1,3 +1,12 @@
+# Ethan Dibble
+# 
+# MNIST two-layer perceptron
+# 
+# Change the parameters below the name guard at the bottom of this file.
+# There you will also find a description and values for the experiments ran.
+# Learning rate was set to 0.1 and epochs to 50 for each experiment performing
+# stochastic gradient descent with a batch size of one.
+
 import sys
 import math
 import numpy as np
@@ -109,14 +118,14 @@ class Perceptron:
         """
         Train the model
         """
-        train_accuracies = []
-        test_accuracies = []
-        output_activations = np.zeros(self.output_units)        # output activations
-        hidden_activations = np.zeros(self.hidden_units + 1)    # hidden activations +1 for bias
-        output_errors = np.zeros(self.output_units)
-        hidden_errors = np.zeros(self.hidden_units)
-        output_weight_updates = np.zeros(np.shape(self.output_weights))
-        hidden_weight_updates = np.zeros(np.shape(self.hidden_weights))
+        train_accuracies = []                                               # train accuracies
+        test_accuracies = []                                                # test accuracies
+        output_activations = np.zeros(self.output_units)                    # output activations
+        hidden_activations = np.zeros(self.hidden_units + 1)                # hidden activations +1 for bias
+        output_errors = np.zeros(self.output_units)                         # output node errors
+        hidden_errors = np.zeros(self.hidden_units)                         # hidden node errors
+        output_weight_updates = np.zeros(np.shape(self.output_weights))     # output weight updates
+        hidden_weight_updates = np.zeros(np.shape(self.hidden_weights))     # hidden weight updates
 
         for epoch in range(epochs + 1):
             # i-th input
@@ -315,6 +324,6 @@ if __name__ == '__main__':
     momentum = 0.9
     hidden_units = 20
     epochs = 1
-    fraction = 1
+    fraction = 1            # what % of the test set to use
 
     sys.exit(main(learning_rate, momentum, hidden_units, epochs, fraction))
