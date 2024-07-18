@@ -38,7 +38,6 @@ class Perceptron:
         """
         Forward phase
         """
-        # forward phase
         # hidden activations
         for j in range(self.hidden_units):
             # j-th hidden unit
@@ -57,7 +56,6 @@ class Perceptron:
         """
         Get errors
         """
-        # not all fine and dandy
         # output errors
         for k in range(self.output_units):
             t = 0.9 if k == target else 0.1
@@ -166,7 +164,7 @@ class Perceptron:
 
                 elif epoch != 0:
                     # not all fine and dandy
-
+                    
                     # errors
                     self.errors(output_activations, output_errors, hidden_activations, hidden_errors, target)
 
