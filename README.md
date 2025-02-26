@@ -1,3 +1,5 @@
+This is based on my previous "MNIST-single-layer-perceptron"
+
 # Results:
 For each experiment, learning rate
 was set to 0.1, epochs to 50, and used a batch size of 1. The default momentum was
